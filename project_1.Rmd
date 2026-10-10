@@ -1,0 +1,121 @@
+---
+title: "Project-1: Distribution Comparison"
+output: pdf_document
+---
+
+Author: Ali Can
+
+> This mini project aims to compare the distribution of random exponential numbers against sample means of random exponential numbers and display the latter is approximately normal.
+
+# 0. Import
+
+``` {r}
+suppressPackageStartupMessages({
+  library(tidyverse)
+  library(e1071)
+  library(car)
+})
+```
+
+# 1. Distribution of Random Exponential Numbers
+
+> Code below will randomly create 1 sample (40 observations) of exponential numbers, take their mean and variance, compare them with the theoretical parameters and graph their sample distribution.
+
+```{r}
+set.seed(42)
+
+rate=0.2
+n <- 40
+
+nums <- rexp(n, rate=rate)
+mean_nums <- mean(nums)
+mean_theoretical <- 1/rate
+cat("Mean of random exponential numbers:", mean_nums, "\n")
+cat("Theoretical mean:", mean_theoretical, "\n")
+
+var_nums <- var(nums)
+var_theoretical <- 1/rate^2
+cat("Variance of random exponential numbers:", var_nums, "\n")
+cat("Theoretical variance:", var_theoretical)
+
+as.data.frame(nums) |>
+  ggplot(aes(x=nums)) +
+  geom_boxplot(fill="blue", outlier.shape=22) +
+  theme_grey() +
+  labs(title="The Distribution of Exponential Random Numbers (1 sample, 40 observations)", x="")
+```
+
+# 2. Distribution of Sample Means of Random Exponential Numbers
+
+> Code below will randomly create 1000 samples (40 observations each) of exponential numbers, take sample means, take mean of sample means and graph "mean of sample means" distribution.
+
+``` {r}
+sample_size <- 1000
+
+means <- apply(matrix(rexp(n=n*sample_size, rate=rate), sample_size), 1, mean)
+mean_means <- mean(means)
+cat("Mean of sample means of random exponential numbers:", mean_means, "\n")
+cat("Theoretical mean:", mean_theoretical, "\n")
+
+var_means <- var(means)
+var_theoretical <- 1/rate^2/n
+cat("Variance of random exponential numbers:", var_means, "\n")
+cat("Theoretical variance:", var_theoretical)
+
+as.data.frame(means) |>
+  ggplot(aes(x=means)) +
+  geom_histogram(bins=25, fill="orange", color="blue") +
+  labs(title="Sample Means Distribution", x="", y="Count") +
+  theme_minimal()
+```
+
+> We have two results to declare:
+
+> 1. Means of random exponential numbers and sample means of random exponential numbers are quite similar.
+
+> 2. While the distribution of random exponential numbers is an exponential distribution as expected, the distribution of sample means of random exponential numbers is gaussian alike.
+
+# 3. Normality Approximation of Sample Means Distribution
+
+1. Skewness
+
+> Code below will determine skewwness of the distribution of sample means
+
+``` {r}
+skew <- skewness(means)
+cat("Skewness is: ", skew, "\n")
+
+if(abs(skew)>0.5){
+  cat("Considerable skewness!, Normality approximation is low.")
+} else{
+  cat("Slight skewness!, Normality approximation is high.")
+}
+```
+2. Kurtosis
+
+> Code below will determine kurtosis of the distribution of sample means
+
+``` {r}
+kurt <- kurtosis(means)
+cat("Kurtosis is: ", kurt, "\n")
+
+if(abs(skew)>1){
+  cat("Considerable kurtosis!, Normality approximation is low.")
+} else{
+  cat("Slight kurtosis!, Normality approximation is high.")
+}
+```
+
+3. QQ Plot
+
+> Code below will make a comparison between quantiles of the distribution of sample means against standard normal quantiles and graph them.
+
+```{r}
+means_scaled <- scale(means)
+
+qqnorm(means_scaled) 
+
+qqline(means_scaled, col = "red")
+```
+
+> It is obvious that the sample means approximates normality considerably.

@@ -1,0 +1,136 @@
+---
+title: "Project-2: Statistical Descriptive Statistics"
+output: pdf_document
+---
+
+Author: Ali Can
+
+> This mini project aims to conduct a statistical descriptive analysis based on dataset "ToothGrowth"
+
+# 0. Import
+
+``` {r}
+suppressPackageStartupMessages({
+  library(tidyverse)
+  library(e1071)
+  library(car)
+})
+```
+
+# 1. Data Exploration and Manipulation
+
+1. Call the dataset and see the first 6 rows
+
+``` {r}
+data(ToothGrowth)
+tg <- ToothGrowth
+head(tg)
+```
+2. See the dimensions and structure of the dataset
+
+``` {r}
+cat(dim(tg))
+str(tg)
+```
+3. See the numerical summary of the dataset
+
+``` {r}
+summary(tg)
+```
+> Obviously, dataset has 3 variables.
+
+> - "len" shows the elongation in teeth. Mean and median are close indicating normality.
+
+> - "supp" shows the method of vitamin C intake: either by pill (VC, vitaminc C) or juice (OJ, orange juice). This is a categoric field of values (OJ, VC). There are equal unmber of records (30) for each.
+
+> - "dose" shows the dose of intake per day. This is categoric field of values (0.5, 1, 2). Median is 1 indicating uniform distribution
+
+4. Boxplot of "len" IAW "supp" category
+
+``` {r}
+tg |>
+  ggplot(aes(y=len)) +
+  geom_boxplot(aes(fill=supp)) +
+  labs(title="Teeth Length Distribution by Supplement", x="", y="Teeth Length", fill="supplement")
+```
+
+# Hypothesis Tests
+
+### 1. Is there a considerable difference in "len" between "supp" categories: OJ, VC
+
+``` {r}
+oj_len <- tg[tg$supp=="OJ", "len"]
+vc_len <- tg[tg$supp=="VC", "len"]
+
+t.test(x=oj_len, y=vc_len)
+# defaults: alt:two sided test, conf.level: 0.95, paired=F, var.equal=F
+```
+> Comments
+
+Assumptions: We seek for difference. Hence two sided test is applied.
+
+1. Calculated positive t value is less than what alpha (0.05) dictates.
+
+2. P value is greater than alpha
+
+3. Confidence interval includes zero
+
+RESULT: Null hypothesis of "means are equal" is FAILED TO REJECT.
+
+### 2. Is there a considerable difference in "len" between "dose" categories: 0.5, 1, 2
+
+> Data manipulation
+
+``` {r}
+half_len <- tg[tg$dose==0.5, "len"]
+one_len <- tg[tg$dose==1, "len"]
+two_len <- tg[tg$dose==2, "len"]
+```
+
+> Fist t test between the teeth length effect of 0.5 and 1 doses of vitamin c supplement
+
+``` {r}
+t.test(x=half_len, y=one_len, alt="less")
+# defaults: conf.level: 0.95, paired=F, var.equal=F
+```
+
+> Second t test between the teeth length effect of 1 and 2 doses of vitamin c supplement
+
+``` {r}
+t.test(x=one_len, y=two_len, alt="less")
+# defaults: conf.level: 0.95, paired=F, var.equal=F
+```
+> Comments
+
+Assumptions: We assume lesser dose would translate into lesser teeth elongation. Hence one sided (lesser than) test is applied.
+
+1. calculated t values are considerably less than what alpha (0.05) dictates.
+
+2. p values is way lesser than alpha
+
+3. Confidence intervals does not include zero
+
+RESULT: Null hypothesis of "true difference in means is NOT less than 0" is rejected.
+
+### 3. Is there a considerable difference in "len" between "supp" categories: OJ, VC when the "dose":2
+
+``` {r}
+tg_two <- tg[tg$dose==2,]
+
+oj_two_len <- tg[tg_two$supp=="OJ", "len"]
+vc_two_len <- tg[tg_two$supp=="VC", "len"]
+
+t.test(x=oj_two_len, y=vc_two_len)
+# defaults: alt:two sided test, conf.level: 0.95, paired=F, var.equal=F)
+```
+> Comments
+
+Assumptions: We seek for difference. Hence two sided test is applied.
+
+1. calculated negative t value is considerably more than what alpha (0.05) dictates.
+
+2. p values is way greater than alpha
+
+3. Confidence intervals includes zero
+
+RESULT: Null hypothesis of "true difference in means is 0" is failed to reject.
