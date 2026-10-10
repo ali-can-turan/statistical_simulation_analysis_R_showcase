@@ -15,6 +15,8 @@ This project explores the properties of random exponential distributions and dem
   
 <img width="878" height="546" alt="1" src="https://github.com/user-attachments/assets/dbe0cca1-34fa-4811-aebf-fafb25cebc45" />
 
+[See the Project 1](project_1.Rmd)
+
 ---
 
 ## 📁 Project 2: Statistical Descriptive Analysis & Hypothesis Testing
@@ -30,6 +32,8 @@ This project conducts an exploratory data analysis and hypothesis testing pipeli
   * Analyzed interaction effects at specific dosage levels (e.g., `dose = 2`).
 
 <img width="876" height="542" alt="2" src="https://github.com/user-attachments/assets/902c5025-dc17-4e35-a5ba-1855537f7afb" />
+
+[See the Project 2](project_2.Rmd)
 
 ---
 
